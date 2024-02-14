@@ -1,0 +1,23 @@
+* {
+    box-sizing: border-box;
+}
+
+.box-parent {
+    padding-top: 20px;
+    background-color: aqua;
+}
+
+.box {
+    display: inline-block;
+    width: 100px;
+    height: 100px;
+    background-color: burlywood;
+    border: 5px solid darkred;
+    border-radius: 5px;
+    /* padding: 16px 42px; */
+    text-align: center;
+}
+
+.box:nth-child(n + 3) {
+    background-color: gold;
+}
