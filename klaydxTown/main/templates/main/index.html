@@ -1,0 +1,180 @@
+{% extends 'main/layout.html' %}
+{% load static %}
+{% block title %}Главная страница{% endblock %}
+
+{% block content %}
+<header class="header-text">
+  <h1>klaydx</h1>
+  <h2>Музыкант, продюсер и композитор</h2>
+  <br>
+  <h2 class="text-bio">О музыканте</h2>
+  <p>Меня зовут Костя! Я начинающий музыкант, это мое хобби. <br>Моя цель - пытатся придумывать свои стили музыки.</p>
+</header>
+
+<section class="music">
+  <h2>Музыка</h2>
+  <p>Ознакомьтесь с последними треками:</p>
+  <div id="audio-players-container"></div>
+
+  </ul>
+  </div>
+</section>
+<script>const tracks = [
+  {
+    title: "OXBRIDGE, klaydx - ARMOR <br> 1 Dec. 2024",
+    src: "{% static 'main/music/armor.mp3' %}",
+    cover: "{% static 'main/img/armor.jpg' %}",
+  },
+  {
+    title: "klaydx - Desolator <br> 24 Nov. 2024",
+    src: "{% static 'main/music/desolator.mp3' %}",
+    cover: "{% static 'main/img/desolator.jpg' %}",
+  },
+];
+
+const audioContainer = document.getElementById("audio-players-container");
+
+tracks.forEach((track) => {
+  const audioPlayer = document.createElement("div");
+  audioPlayer.classList.add("audio-player");
+
+  // Основной стиль для аудиоплеера
+  Object.assign(audioPlayer.style, {
+    overflow: "hidden",
+    background: "linear-gradient(145deg, rgba(0,0,0,1) 0%, rgba(42,42,42,1) 100%)",
+    borderRadius: "25px",
+    border: "2px solid rgb(53, 53, 53)",
+    marginBottom: "20px",
+    display: "flex",
+    padding: "15px",
+    alignItems: "center",
+  });
+
+  // HTML структура аудиоплеера
+  audioPlayer.innerHTML = `
+    <div class="audio-img">
+      <img src="${track.cover}" alt="${track.title}">
+    </div>
+    <div class="audio-controls">
+      <div class="name">${track.title}</div>
+      <div class="timeline">
+        <div class="progress"></div>
+      </div>
+      <div class="controls">
+        <div class="play-container">
+          <div class="toggle-play play"></div>
+        </div>
+        <div class="time">
+          <span class="current">0:00</span> / <span class="length">0:00</span>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Стили для обложки
+  const audioImg = audioPlayer.querySelector(".audio-img img");
+  Object.assign(audioImg.style, {
+    width: "80px",
+    height: "80px",
+    objectFit: "cover",
+    borderRadius: "10px",
+    marginRight: "20px",
+    border: "2px solid rgb(83, 83, 83)",
+  });
+
+  // Стили для названия
+  const nameElement = audioPlayer.querySelector(".name");
+  Object.assign(nameElement.style, {
+    fontSize: "1.2em",
+    marginBottom: "10px",
+    fontWeight: "bold",
+    color: "white",
+  });
+
+  // Стили для таймлайна
+  const timeline = audioPlayer.querySelector(".timeline");
+  Object.assign(timeline.style, {
+    width: "100%",
+    height: "6px",
+    background: "#ccc",
+    borderRadius: "4px",
+    overflow: "hidden",
+    boxShadow: "0 -2px 5px rgba(0, 0, 0, 0.5)",
+    marginTop: "10px",
+  });
+
+  // Стили для прогресса
+  const progress = audioPlayer.querySelector(".progress");
+  Object.assign(progress.style, {
+    background: "rgb(103, 62, 204)",
+    height: "100%",
+    width: "0",
+    transition: "width 0.25s",
+  });
+
+  // Стили для управления
+  const controls = audioPlayer.querySelector(".controls");
+  Object.assign(controls.style, {
+    display: "flex",
+    alignItems: "center",
+    gap: "10px",
+    color: "white",
+  });
+
+  // Добавляем аудио в HTML
+  audioContainer.appendChild(audioPlayer);
+
+  // Аудио элемент
+  const audio = new Audio(track.src);
+
+  // Элементы управления
+  const playContainer = audioPlayer.querySelector(".play-container");
+  const togglePlay = playContainer.querySelector(".toggle-play");
+  const currentTimeElem = audioPlayer.querySelector(".current");
+  const durationElem = audioPlayer.querySelector(".length");
+
+  // Обновление времени
+  audio.addEventListener("loadeddata", () => {
+    durationElem.textContent = formatTime(audio.duration);
+  });
+
+  // Обновление прогресса
+  audio.addEventListener("timeupdate", () => {
+    currentTimeElem.textContent = formatTime(audio.currentTime);
+    const progressWidth = (audio.currentTime / audio.duration) * 100;
+    progress.style.width = `${progressWidth}%`;
+  });
+
+  // Форматирование времени
+  function formatTime(time) {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60).toString().padStart(2, "0");
+    return `${minutes}:${seconds}`;
+  }
+
+  // Переключение проигрывания
+  playContainer.addEventListener("click", () => {
+    if (audio.paused) {
+      audio.play();
+      togglePlay.classList.remove("play");
+      togglePlay.classList.add("pause");
+    } else {
+      audio.pause();
+      togglePlay.classList.remove("pause");
+      togglePlay.classList.add("play");
+    }
+  });
+
+  // Обработка перемотки по таймлайну
+  timeline.addEventListener("click", (e) => {
+    const timelineWidth = timeline.offsetWidth;
+    const clickX = e.offsetX;
+    const newTime = (clickX / timelineWidth) * audio.duration;
+    audio.currentTime = newTime;
+  });
+});
+
+
+</script>
+
+{% endblock %}
